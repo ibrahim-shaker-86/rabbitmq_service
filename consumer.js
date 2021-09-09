@@ -17,7 +17,7 @@ async function connect() {
     // Consume message
     channel.consume('jobs', (msg) => {
       const parsedMsg = JSON.parse(msg.content.toString());
-      console.log(`Received job number is ${parsedMsg.number}`);
+      console.log(`Received job number is ${parsedMsg.jobNumber}`);
     });
 
     // Acknowledge message to clear from queue
