@@ -1,12 +1,9 @@
 // Use the advanced messaging queue protocol
 const amqp = require('amqplib');
 
-// Get the jobNumber automatically from the command line
-const msg = { jobNumber: process.argv[2] };
-
 connect();
 
-// Create connection to server
+// Create TCP connection to server
 async function connect() {
   try {
     const connection = await amqp.connect('amqp://localhost:5672');
@@ -17,10 +14,16 @@ async function connect() {
     // Create queue
     const result = await channel.assertQueue('jobs');
 
-    // Send message
-    channel.sendToQueue('jobs', Bufferl.from(JSON.stringify(msg)));
+    // Consume message
+    channel.consume('jobs', (msg) => {
+      const parsedMsg = JSON.parse(msg.content.toString());
+      console.log(`Received job number is ${parsedMsg.number}`);
+    });
 
-    console.log(`job ${msq.jobNumber} has been sent successfully`);
+    // Acknowledge message to clear from queue
+    channel.ack(msg);
+
+    console.log('Waiting form messages...');
   } catch (ex) {
     console.error(ex);
   }
